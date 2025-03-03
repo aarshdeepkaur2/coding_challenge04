@@ -1,12 +1,24 @@
 import express, { Router } from "express";
-import { getUserProfile, deleteUser } from "../Controllers/userController";
+import { getUserDetails, deleteUser } from "../controllers/userController";
+import { authenticate } from "../middleware/authenticate";
+import isAuthorized from "../middleware/authorize";
 
 const router: Router = express.Router();
 
-/** Route to get the user's profile. */
-router.get("/profile", getUserProfile);
+/** Route to get user details (requires authentication and admin role). */
+router.get(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin"] }),
+    getUserDetails
+);
 
-/** Route to delete a user (students to implement authorization). */
-router.delete("/:id", deleteUser);
+/** Route to delete a user (requires authentication and admin role). */
+router.delete(
+    "/:id",
+    authenticate,
+    isAuthorized({ hasRole: ["admin"] }),
+    deleteUser
+);
 
 export default router;
